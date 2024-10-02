@@ -136,7 +136,7 @@ impl DeriveChoice {
 #[allow(clippy::unwrap_used)]
 mod tests {
     use super::DeriveChoice;
-    use crate::{Asn1Type, Tag, TagMode};
+    use crate::{attributes::Class, Asn1Type, Tag, TagMode};
     use syn::parse_quote;
 
     /// Based on `Time` as defined in RFC 5280:
@@ -167,7 +167,7 @@ mod tests {
         let utc_time = &ir.variants[0];
         assert_eq!(utc_time.ident, "UtcTime");
         assert_eq!(utc_time.attrs.asn1_type, Some(Asn1Type::UtcTime));
-        assert_eq!(utc_time.attrs.context_specific, None);
+        assert_eq!(utc_time.attrs.class, None);
         assert_eq!(utc_time.attrs.tag_mode, TagMode::Explicit);
         assert_eq!(utc_time.tag, Tag::Universal(Asn1Type::UtcTime));
 
@@ -177,7 +177,7 @@ mod tests {
             general_time.attrs.asn1_type,
             Some(Asn1Type::GeneralizedTime)
         );
-        assert_eq!(general_time.attrs.context_specific, None);
+        assert_eq!(general_time.attrs.class, None);
         assert_eq!(general_time.attrs.tag_mode, TagMode::Explicit);
         assert_eq!(general_time.tag, Tag::Universal(Asn1Type::GeneralizedTime));
     }
@@ -211,8 +211,8 @@ mod tests {
         assert_eq!(bit_string.ident, "BitString");
         assert_eq!(bit_string.attrs.asn1_type, Some(Asn1Type::BitString));
         assert_eq!(
-            bit_string.attrs.context_specific,
-            Some("0".parse().unwrap())
+            bit_string.attrs.class,
+            Some(Class::ContextSpecific("0".parse().unwrap()))
         );
         assert_eq!(bit_string.attrs.tag_mode, TagMode::Implicit);
         assert_eq!(
@@ -226,7 +226,10 @@ mod tests {
         let time = &ir.variants[1];
         assert_eq!(time.ident, "Time");
         assert_eq!(time.attrs.asn1_type, Some(Asn1Type::GeneralizedTime));
-        assert_eq!(time.attrs.context_specific, Some("1".parse().unwrap()));
+        assert_eq!(
+            time.attrs.class,
+            Some(Class::ContextSpecific("1".parse().unwrap()))
+        );
         assert_eq!(time.attrs.tag_mode, TagMode::Implicit);
         assert_eq!(
             time.tag,
@@ -240,8 +243,8 @@ mod tests {
         assert_eq!(utf8_string.ident, "Utf8String");
         assert_eq!(utf8_string.attrs.asn1_type, Some(Asn1Type::Utf8String));
         assert_eq!(
-            utf8_string.attrs.context_specific,
-            Some("2".parse().unwrap())
+            utf8_string.attrs.class,
+            Some(Class::ContextSpecific("2".parse().unwrap()))
         );
         assert_eq!(utf8_string.attrs.tag_mode, TagMode::Implicit);
         assert_eq!(
